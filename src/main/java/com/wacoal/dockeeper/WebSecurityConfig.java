@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .url("ldap://10.11.9.135:389/dc=wacoal,dc=co,dc=th")
 //                .and()
 //                .passwordCompare()
-//                //                .passwordEncoder(new LdapShaPasswordEncoder())
+//                .passwordEncoder(new LdapShaPasswordEncoder())
 //                .passwordEncoder(new Md5PasswordEncoder())
 //                .passwordAttribute("userPassword");
 //    }
@@ -51,13 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .ldapAuthentication()
-                .userDnPatterns("uid={0}")
-                .groupSearchBase("ou=user")
-                .contextSource()
-                .url("ldap://10.11.9.135:389/dc=wacoal,dc=co,dc=th")
-                .and()
-                .passwordCompare()
-                .passwordEncoder(new Md5PasswordEncoder())
-                .passwordAttribute("userPassword");
+                .userDnPatterns("uid={0},ou=user")
+                .contextSource() 
+                .url("ldap://10.11.9.135:389/dc=wacoal,dc=co,dc=th");
     }
 }
