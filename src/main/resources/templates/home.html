@@ -9,10 +9,13 @@ and open the template in the editor.
         <title>TODO supply a title</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <div th:replace="fragments/header :: header-css" />
-    </head>
-    <body>
-        <div>this is a home</div>
-        <div th:replace="fragments/header :: header-js" />
-    </body>
+    <div th:replace="fragments/header :: header-css" />
+</head>
+<body>
+    <div>this is a home</div>
+    <div th:replace="fragments/header :: header-js" />
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out" />
+    </form>
+</body>
 </html>
