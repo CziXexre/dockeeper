@@ -1,13 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<body>
+    <head>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
-<h1>Spring Boot file upload example</h1>
+    </head>
+    <body>
 
-<form method="POST" action="/doupload" enctype="multipart/form-data">
-    <input type="file" name="file" /><br/><br/>
-    <input type="submit" value="Submit" />
-</form>
+        <div class="container">
+            <h1>Spring Boot file upload example</h1>
 
-</body>
+            <form method="POST" th:action="@{/doupload(${_csrf.parameterName}=${_csrf.token})}" enctype="multipart/form-data">
+                <input type="text" name="ownerId" /><br />
+                <select id="typeId" name="typeId"></select> <br />
+                <input type="file" name="file" /><br/>
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
+
+    </body>
 </html>
+<script>
+    $(document).ready(function () {
+        $.getJSON("/ajax/mstype", function(data) {
+        $("#typeId").html('');
+           $.each(data, function(){
+               $("#typeId").append('<option value="' + this.typeId + '">' + this.typeName + '</option>');
+            });
+        });
+    });
+</script>

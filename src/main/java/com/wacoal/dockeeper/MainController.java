@@ -9,14 +9,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wacoal.dockeeper.wsdl.EmpClass;
 import com.wacoal.dockeeper.wsdl.GetEmpByFilterResponse;
+import java.security.Principal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
+import javax.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,14 +43,15 @@ public class MainController {
     EmpClient empClient;
 
     @Autowired
-    DataSource datasource;
+    DataSource datasouce;
 
     @RequestMapping(method = RequestMethod.GET, value = "")
-    public ModelAndView index(Model model) {
+    public ModelAndView index(Model model, Principal principal) {
         GetEmpByFilterResponse resp = empClient.getEmpByFilter();
         List<EmpClass> emps = resp.getGetEmpByFilterResult().getEmpClass();
         EmpClass emp = emps.get(0);
         model.addAttribute("emp", emp);
+        System.out.println("User Login : " + principal.getName());
         return new ModelAndView("main");
     }
 
@@ -70,7 +76,7 @@ public class MainController {
     public String getSomeParam(
             @RequestParam(value = "name", required = false, defaultValue = "World") String name
     ) throws Exception {
-        Connection con = this.datasource.getConnection();
+        Connection con = this.datasouce.getConnection();
         Statement stmt = con.createStatement();
         ResultSet res = stmt.executeQuery("select * from tb_attach");
         while (res.next()) {
@@ -78,7 +84,11 @@ public class MainController {
         }
         res.close();
         stmt.close();
+
+        CallableStatement func = con.prepareCall("");
+
         con.close();
+
         return "Some " + name;
     }
 
@@ -87,6 +97,23 @@ public class MainController {
             @RequestBody String name
     ) {
         return "Some " + name;
+    }
+
+    @GetMapping("/reports/{reportname:.+}")
+    public ModelAndView viewReports(
+            final ModelMap modelMap,
+            ModelAndView view,
+            @PathParam("reportname") String reportname,
+            @RequestParam("format") String format,
+            @RequestParam("p_type_id") String typeId
+    ) {
+
+        modelMap.put("datasource", this.datasouce);
+        modelMap.put("format", format);
+        modelMap.put("p_type_id", typeId);
+        view = new ModelAndView(reportname, modelMap);
+
+        return view;
     }
 
 }
